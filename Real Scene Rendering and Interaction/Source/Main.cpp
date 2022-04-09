@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Input.h"
+#include "Terrain.h"
 
 int main(void)
 {
@@ -25,6 +26,12 @@ int main(void)
     gladLoadGL();
 
     glfwSetKeyCallback(window, key_callback);
+
+    Terrain NewTerrain(10);
+
+    NewTerrain.Generate(2);
+
+    NewTerrain.LogTerrain();
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
