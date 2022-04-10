@@ -16,7 +16,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Real Scene Rendering and Interaction", NULL, NULL);
+    window = glfwCreateWindow(1920, 1080, "Real Scene Rendering and Interaction", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -64,7 +64,7 @@ int main(void)
         glm::mat4 projection = glm::perspective(45.0f, 16.0f / 9, 0.1f, 100.0f);
 
         shader.setMat4("projection", projection);
-        shader.setMat4("view", cam.getPosition());
+        shader.setMat4("view", Input::getInstance().cam.getPosition());
         shader.setMat4("model", NewTerrain.m_Xmw);
 
         NewTerrain.Render();

@@ -9,6 +9,10 @@ Camera::Camera(Time* _time)
 {
 }
 
+void Camera::SetTime(Time* _time) {
+	time = _time;
+}
+
 glm::mat4 Camera::getPosition()
 {
 	return glm::lookAt(position, position + forward, up);

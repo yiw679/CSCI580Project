@@ -4,9 +4,11 @@
 
 class Input
 {
-	Camera cam;
+
 
 public:
+	Camera cam;
+
 	static Input& getInstance()
 	{
 		static Input instance; 
