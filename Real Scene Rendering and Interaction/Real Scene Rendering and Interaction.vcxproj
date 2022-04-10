@@ -145,14 +145,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Shader.cpp" />
+    <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Terrain.cpp" />
     <ClCompile Include="Source\glad.c" />
     <ClCompile Include="Source\Input.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Shader.h" />
+    <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\Terrain.h" />
     <ClInclude Include="Source\Input.h" />
+    <ClInclude Include="Source\Time.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\shader.fs" />
+    <None Include="Source\shader.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
