@@ -18,6 +18,7 @@ Terrain::Terrain(int size, float scale, float heightScale)
 	m_PositionBuffer.resize(squareSize);
 	m_NormalBuffer.resize(squareSize);
 	m_ColorBuffer.resize(squareSize);
+	m_TexCoordBuffer.resize(squareSize);
 
 	int numTriangles = (m_size - 1) * (m_size - 1) * 2;
 
@@ -83,19 +84,46 @@ void Terrain::Generate(float mag, float roughness) {
 		{
 			int index = y * m_size + x;
 
-			float m_x = x / (float)(m_size - 1) * m_scale - m_scale / 2;
+			float S = x / (float)(m_size - 1);
+			float T = y / (float)(m_size - 1);
+
+			float m_x = S * m_scale - m_scale / 2;
 			float m_y = points[y][x] * m_heightScale;
-			float m_z = y / (float)(m_size - 1) * m_scale - m_scale / 2;
+			float m_z = T * m_scale - m_scale / 2;
 
 			m_PositionBuffer[index] = glm::vec3(m_x, m_y, m_z);
 			m_NormalBuffer[index] = glm::vec3(0,0,0);
-			m_ColorBuffer[index] = glm::vec4(m_y, 1.0f, 1.0f, 1.0f);
+			m_ColorBuffer[index] = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+			m_TexCoordBuffer[index] = glm::vec2(S, T);
 		}
 	}
 
 	GenerateIndexBuffer();
 	GenerateNormals();
 	GenerateVertexBuffers();
+}
+
+bool Terrain::LoadTexture(const char* fileName, unsigned int textureIndex) {
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load(fileName, &width, &height, &nrChannels, 0);
+
+	glGenTextures(1, &m_GLTextures[textureIndex]);
+	glBindTexture(GL_TEXTURE_2D, m_GLTextures[textureIndex]);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	stbi_image_free(data);
+
+	return m_GLTextures[textureIndex] != 0;
 }
 
 void Terrain::GenerateIndexBuffer() {
@@ -132,6 +160,7 @@ void Terrain::GenerateNormals() {
 		m_NormalBuffer[m_IndexBuffer[i + 2]] += normal;
 	}
 
+	const glm::vec3 UP(0.0f, 1.0f, 0.0f);
 	for (int i = 0; i < m_NormalBuffer.size(); i++)
 	{
 		m_NormalBuffer[i] = glm::normalize(m_NormalBuffer[i]);
@@ -151,6 +180,10 @@ void Terrain::GenerateVertexBuffers() {
 	glBindBuffer(GL_ARRAY_BUFFER, m_ColorBufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * m_ColorBuffer.size(), &(m_ColorBuffer[0]), GL_STATIC_DRAW);
 
+	glGenBuffers(1, &m_Tex1BufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_Tex1BufferID);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * m_TexCoordBuffer.size(), &m_TexCoordBuffer[0], GL_STATIC_DRAW);
+
 	glGenBuffers(1, &m_IndexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, m_IndexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLuint) * m_IndexBuffer.size(), &(m_IndexBuffer[0]), GL_STATIC_DRAW);
@@ -161,9 +194,22 @@ void Terrain::Render() {
 	glPushMatrix();
 	glMultMatrixf(glm::value_ptr(m_Xmw));
 
+	glActiveTexture(GL_TEXTURE0);
+	glMatrixMode(GL_TEXTURE);
+	glPushMatrix();
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, m_GLTextures[0]);
+
+	glClientActiveTexture(GL_TEXTURE0);
+
+	glEnable(GL_TEXTURE);
+	glEnable(GL_LIGHTING);
+
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VertexBufferID);
 	glVertexPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
@@ -173,7 +219,7 @@ void Terrain::Render() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_ColorBufferID);
 	glColorPointer(4, GL_FLOAT, 0, BUFFER_OFFSET(0));
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 
 
@@ -182,6 +228,10 @@ void Terrain::Render() {
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(2);
 
+	glBindBuffer(GL_ARRAY_BUFFER, m_Tex1BufferID);
+	glTexCoordPointer(2, GL_FLOAT, 0, BUFFER_OFFSET(0));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(3);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferID);
 	glDrawElements(GL_TRIANGLES, m_IndexBuffer.size(), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
@@ -189,8 +239,17 @@ void Terrain::Render() {
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
+	glActiveTexture(GL_TEXTURE0);
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+	glClientActiveTexture(GL_TEXTURE0);
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 }

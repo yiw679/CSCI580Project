@@ -42,11 +42,13 @@ int main(void)
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
 
-    Terrain NewTerrain(33, 0.1, 0.01);
+    int map_size = 128;
 
-    //NewTerrain.LogTerrain();
+    Terrain NewTerrain(map_size + 1, 0.1, 0.01);
 
-    NewTerrain.Generate(60, 0.4);
+    NewTerrain.Generate(100, 0.6);
+
+    NewTerrain.LoadTexture("Textures/grass.jpg", 0);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -60,7 +62,7 @@ int main(void)
         glLoadIdentity();
 
         shader.Enable();
-
+        shader.setFloat("tileSize", (3 / (float)map_size));
         glm::mat4 projection = glm::perspective(45.0f, 16.0f / 9, 0.1f, 100.0f);
 
         shader.setMat4("projection", projection);

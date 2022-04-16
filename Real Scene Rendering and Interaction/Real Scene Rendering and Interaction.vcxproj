@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Shader.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
+    <ClCompile Include="Source\stb_image.cpp" />
     <ClCompile Include="Source\Terrain.cpp" />
     <ClCompile Include="Source\glad.c" />
     <ClCompile Include="Source\Input.cpp" />
@@ -154,6 +155,7 @@
     <ClCompile Include="Source\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\stb_image.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\Terrain.h" />
