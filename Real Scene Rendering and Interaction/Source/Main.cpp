@@ -85,7 +85,7 @@ int main(void)
 
         glm::mat4 projection = glm::perspective(45.0f, 16.0f / 9, 0.1f, 100.0f);
         glm::mat4 model = NewTerrain.m_Xmw;
-        glm::mat4 lightModel = glm::rotate(glm::radians((float) glfwGetTime() * 90), glm::vec3(0, -1, 0)) * glm::translate(glm::vec3(90, 0, 0)) * model;
+        glm::mat4 lightModel = glm::rotate(model, glm::radians((float) glfwGetTime() * 90), glm::vec3(0, -1, 0)) * glm::translate(model, glm::vec3(90, 0, 0));
 
         shader.setMat4("projection", projection);
         shader.setMat4("view", Input::getInstance().cam.getPosition());
