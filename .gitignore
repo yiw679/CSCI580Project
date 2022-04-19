@@ -20,6 +20,11 @@
 *.out
 *.app
 
+#vs proj files
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
 .vs/
 Debug/
 Packages/
