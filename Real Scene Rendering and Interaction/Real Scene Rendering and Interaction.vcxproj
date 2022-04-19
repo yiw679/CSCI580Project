@@ -89,12 +89,14 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Libraries/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)Libraries/lib/lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -106,6 +108,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Libraries/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -114,6 +117,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)Libraries/lib/lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -122,10 +126,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\76900\Desktop\cs580\CSCI580Project\Real Scene Rendering and Interaction\Libraries\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\lib\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -163,6 +170,28 @@
   <ItemGroup>
     <None Include="Source\shader.fs" />
     <None Include="Source\shader.vs" />
+    <None Include="Source\skybox.frag" />
+    <None Include="Source\skybox.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\skybox\back.jpg" />
+    <Image Include="Resources\skybox\bottom.jpg" />
+    <Image Include="Resources\skybox\front.jpg" />
+    <Image Include="Resources\skybox\left.jpg" />
+    <Image Include="Resources\skybox\right.jpg" />
+    <Image Include="Resources\skybox\sample\back.jpg" />
+    <Image Include="Resources\skybox\sample\bottom.jpg" />
+    <Image Include="Resources\skybox\sample\front.jpg" />
+    <Image Include="Resources\skybox\sample\left.jpg" />
+    <Image Include="Resources\skybox\sample\right.jpg" />
+    <Image Include="Resources\skybox\sample\top.jpg" />
+    <Image Include="Resources\skybox\skybox1\back.jpg" />
+    <Image Include="Resources\skybox\skybox1\bottom.jpg" />
+    <Image Include="Resources\skybox\skybox1\front.jpg" />
+    <Image Include="Resources\skybox\skybox1\left.jpg" />
+    <Image Include="Resources\skybox\skybox1\right.jpg" />
+    <Image Include="Resources\skybox\skybox1\top.jpg" />
+    <Image Include="Resources\skybox\top.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
