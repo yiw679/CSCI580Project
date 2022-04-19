@@ -38,6 +38,11 @@ int main(void)
 
     Camera cam = Camera(time);
 
+    // shader
+    const glm::vec4 white(1);
+    const glm::vec4 black(0);
+    const glm::vec4 ambient(0.1f, 0.1f, 0.1f, 1.0f);
+
     Input::getInstance().SetCamera(cam);
 
     glfwSetKeyCallback(window, key_callback);
@@ -79,10 +84,23 @@ int main(void)
         shader.setFloat("tileSize", (3 / (float)map_size));
 
         glm::mat4 projection = glm::perspective(45.0f, 16.0f / 9, 0.1f, 100.0f);
+        glm::mat4 model = NewTerrain.m_Xmw;
+        glm::mat4 lightModel = glm::rotate(glm::radians((float) glfwGetTime() * 90), glm::vec3(0, -1, 0)) * glm::translate(glm::vec3(90, 0, 0)) * model;
 
         shader.setMat4("projection", projection);
         shader.setMat4("view", Input::getInstance().cam.getPosition());
-        shader.setMat4("model", NewTerrain.m_Xmw);
+        shader.setMat4("model", model);
+
+        shader.setVec4("LightPosW", glm::value_ptr(lightModel[3]));
+        shader.setVec4("LightColor", glm::value_ptr(white));
+        shader.setVec4("Ambient", glm::value_ptr(ambient));
+
+        shader.setVec4("EyePosW", glm::value_ptr(glm::vec4(cam.position, 1)));
+
+        shader.setVec4("MaterialEmissive", glm::value_ptr(black));
+        shader.setVec4("MaterialDiffuse", glm::value_ptr(white));
+        shader.setVec4("MaterialSpecular", glm::value_ptr(white));
+        shader.setFloat("MaterialShininess", 50.0f);
 
         NewTerrain.Render();
 
