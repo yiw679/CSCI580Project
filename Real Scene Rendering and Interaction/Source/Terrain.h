@@ -7,16 +7,8 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/std_based_type.hpp>
-#include <glm/gtx/vector_angle.hpp>
-#include <glm/gtx/compatibility.hpp>
-#include <glm/gtx/matrix_operation.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/quaternion.hpp>
-#include <glm/gtx/euler_angles.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include "stb_image.h"
+#include <limits>
 
 #define TEXTURE_NUM 3
 
@@ -36,6 +28,13 @@ class Terrain {
 	float m_heightScale;
 
 public:
+
+	float MaxHeight;
+	float MinHeight;
+
+	float grassToRockPercentage;
+	float rockToSnowPercentage;
+	float mixingThreshold;
 
 	Terrain(int size, float size_scale, float height_scale);
 

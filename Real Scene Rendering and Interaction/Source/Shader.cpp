@@ -70,6 +70,11 @@ void Shader::setFloat(const std::string& name, float value) const
 	glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
 }
 
+void Shader::setInt(const std::string& name, int value) const
+{
+	glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), value);
+}
+
 void Shader::checkCompileErrors(GLuint shader, std::string type)
 {
     GLint success;

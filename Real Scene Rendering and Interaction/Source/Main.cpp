@@ -35,6 +35,7 @@ int main(void)
 
     Shader shader("Source/shader.vs", "Source/shader.fs");
 
+
     Camera cam = Camera(time);
 
     Input::getInstance().SetCamera(cam);
@@ -46,9 +47,22 @@ int main(void)
 
     Terrain NewTerrain(map_size + 1, 0.1, 0.01);
 
+    NewTerrain.grassToRockPercentage = 0.6f;
+    NewTerrain.rockToSnowPercentage = 0.8f;
+    NewTerrain.mixingThreshold = 0.1f;
     NewTerrain.Generate(100, 0.6);
 
     NewTerrain.LoadTexture("Textures/grass.jpg", 0);
+    NewTerrain.LoadTexture("Textures/rock.jpg", 1);
+    NewTerrain.LoadTexture("Textures/snow.jpg", 2);
+
+    shader.Enable();
+
+    shader.setInt("OutTexture1", 0);
+	shader.setInt("OutTexture2", 1);
+	shader.setInt("OutTexture3", 2);
+
+
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -63,6 +77,7 @@ int main(void)
 
         shader.Enable();
         shader.setFloat("tileSize", (3 / (float)map_size));
+
         glm::mat4 projection = glm::perspective(45.0f, 16.0f / 9, 0.1f, 100.0f);
 
         shader.setMat4("projection", projection);

@@ -25,6 +25,8 @@ public:
 
     void setFloat(const std::string& name, float value) const;
 
+    void setInt(const std::string& name, int value) const;
+
     void checkCompileErrors(GLuint shader, std::string type);
 };
 
