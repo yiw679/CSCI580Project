@@ -26,6 +26,9 @@ Terrain::Terrain(int size, float scale, float heightScale)
 
 	m_scale = (m_size - 1) * scale;
 	m_heightScale = heightScale;
+
+	MaxHeight = numeric_limits<float>::min();
+	MinHeight = numeric_limits<float>::max();
 }
 
 float Terrain::GetHeight(int x, int y) {
@@ -82,6 +85,22 @@ void Terrain::Generate(float mag, float roughness) {
 	{
 		for (int x = 0; x < m_size; x++)
 		{
+			float m_y = points[y][x] * m_heightScale;
+
+			if (m_y > MaxHeight) {
+				MaxHeight = m_y;
+			}
+
+			if (m_y < MinHeight) {
+				MinHeight = m_y;
+			}
+		}
+	}
+
+	for (int y = 0; y < m_size; y++)
+	{
+		for (int x = 0; x < m_size; x++)
+		{
 			int index = y * m_size + x;
 
 			float S = x / (float)(m_size - 1);
@@ -91,9 +110,38 @@ void Terrain::Generate(float mag, float roughness) {
 			float m_y = points[y][x] * m_heightScale;
 			float m_z = T * m_scale - m_scale / 2;
 
+			float percentage = glm::clamp(m_y, MinHeight, MaxHeight);
+			percentage = (percentage - MinHeight) / (MaxHeight - MinHeight);
+
+			float t0 = 0, t1 = 0, t2 = 0, distance = 0;
+
+			if (percentage < grassToRockPercentage) {
+				distance = grassToRockPercentage - percentage;
+				if (distance > mixingThreshold) {
+					t0 = 1;
+				}
+				else {
+					t0 = 1.0f - (percentage - (grassToRockPercentage - mixingThreshold)) / mixingThreshold;
+					t1 = 1.0f - t0;
+				}
+			}
+			else if (percentage < rockToSnowPercentage) {
+				distance = rockToSnowPercentage - percentage;
+				if (distance > mixingThreshold) {
+					t1 = 1;
+				}
+				else {
+					t1 = 1.0f - (percentage - (rockToSnowPercentage - mixingThreshold)) / mixingThreshold;
+					t2 = 1.0f - t1;
+				}
+			}
+			else {
+				t2 = 1;
+			}
+
 			m_PositionBuffer[index] = glm::vec3(m_x, m_y, m_z);
-			m_NormalBuffer[index] = glm::vec3(0,0,0);
-			m_ColorBuffer[index] = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+			m_NormalBuffer[index] = glm::vec3(0, 0, 0);
+			m_ColorBuffer[index] = glm::vec4(t0, t1, t2, 0);
 			m_TexCoordBuffer[index] = glm::vec2(S, T);
 		}
 	}
@@ -184,6 +232,14 @@ void Terrain::GenerateVertexBuffers() {
 	glBindBuffer(GL_ARRAY_BUFFER, m_Tex1BufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * m_TexCoordBuffer.size(), &m_TexCoordBuffer[0], GL_STATIC_DRAW);
 
+	glGenBuffers(1, &m_Tex2BufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_Tex2BufferID);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * m_TexCoordBuffer.size(), &m_TexCoordBuffer[1], GL_STATIC_DRAW);
+
+	glGenBuffers(1, &m_Tex3BufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_Tex3BufferID);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * m_TexCoordBuffer.size(), &m_TexCoordBuffer[2], GL_STATIC_DRAW);
+
 	glGenBuffers(1, &m_IndexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, m_IndexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLuint) * m_IndexBuffer.size(), &(m_IndexBuffer[0]), GL_STATIC_DRAW);
@@ -194,17 +250,35 @@ void Terrain::Render() {
 	glPushMatrix();
 	glMultMatrixf(glm::value_ptr(m_Xmw));
 
-	glActiveTexture(GL_TEXTURE0);
-	glMatrixMode(GL_TEXTURE);
-	glPushMatrix();
-
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, m_GLTextures[0]);
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_GLTextures[0]);
 	glClientActiveTexture(GL_TEXTURE0);
 
-	glEnable(GL_TEXTURE);
-	glEnable(GL_LIGHTING);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_GLTextures[1]);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_TEXTURE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_PRIMARY_COLOR);
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_SRC_COLOR);
+	glClientActiveTexture(GL_TEXTURE1);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, m_GLTextures[2]);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_TEXTURE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_PRIMARY_COLOR);
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_SRC_ALPHA);
+	glClientActiveTexture(GL_TEXTURE2);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -245,6 +319,16 @@ void Terrain::Render() {
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 	glClientActiveTexture(GL_TEXTURE0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+	glClientActiveTexture(GL_TEXTURE1);
+
+	glActiveTexture(GL_TEXTURE2);
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+	glClientActiveTexture(GL_TEXTURE2);
 
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
