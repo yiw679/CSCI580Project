@@ -7,9 +7,6 @@
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
-
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>
 
@@ -17,8 +14,6 @@
 #include<filesystem>
 namespace fs = std::filesystem;
 //--------------------
-
-#define STB_IMAGE_IMPLEMENTATION
 
 float skyboxVertices[] =
 {
@@ -245,10 +240,6 @@ int main(void)
         projection = glm::mat4(1.0f);
         // We make the mat4 into a mat3 and then a mat4 again in order to get rid of the last row and column
         // The last row and column affect the translation of the skybox (which we don't want to affect)
-        /*if (view != glm::mat4(glm::mat3(cam.getPosition()))) {
-            
-        }
-        std::cout << glm::to_string(glm::mat3(cam.getPosition())) << std::endl;*/
         view = glm::mat4(glm::mat3(Input::getInstance().cam.getPosition()));
         projection = glm::perspective(glm::radians(45.0f), (float)1920 / 1081, 0.1f, 100.0f);
         glUniformMatrix4fv(glGetUniformLocation(skyboxShader.shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
