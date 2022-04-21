@@ -6,8 +6,9 @@
 
 #include <iostream>
 #include <vector>
-
 using namespace std;
+
+class Terrain;
 
 class Camera
 {
@@ -18,6 +19,8 @@ public:
 
 	Time* time;
 
+	void update();
+	void setTerrain(Terrain* pTerrain);
 	void SetTime(Time* time);
 	void setLocation(glm::vec3 pos);
 	void moveCamera(int direction);
@@ -25,8 +28,8 @@ public:
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f);
 private:
 
-
-	GLfloat speed = 15.0f;
+	Terrain* m_Terrain;
+	GLfloat speed = 1.5f;
 
 	// cam positions
 

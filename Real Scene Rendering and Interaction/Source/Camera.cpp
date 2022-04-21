@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "Terrain.h"
 
 Camera::Camera()
 {
@@ -7,6 +8,16 @@ Camera::Camera()
 Camera::Camera(Time* _time)
 	: time(_time)
 {
+}
+
+void Camera::update()
+{
+	this->moveCamera(0);
+}
+
+void Camera::setTerrain(Terrain* pTerrain)
+{
+	m_Terrain = pTerrain;
 }
 
 void Camera::SetTime(Time* _time) {
@@ -25,6 +36,7 @@ void Camera::setLocation(glm::vec3 pos)
 
 void Camera::moveCamera(int direction)
 {
+	float y = position.y;
 	switch (direction) {
 	case 1:
 		position += forward * speed * time->deltaTime;
@@ -40,6 +52,19 @@ void Camera::moveCamera(int direction)
 		break;
 	default:
 		break;
+	}
+
+	// update y position according to terrain height
+	if (position.z >= -6.4 && position.z <= 6.4 && position.x >= -6.4 && position.x <= 6.4)
+	{
+		position.y = y;
+		float fHeight = m_Terrain->GetHeightScale() * m_Terrain->GetHeight((int)(position.x*10 + 64), (int)(position.z*10 + 64));
+		if (position.y > fHeight + .17) {
+			position.y -= .007;
+		}
+		if (position.y < fHeight + .16) {
+			position.y += .007;
+		}
 	}
 }
 

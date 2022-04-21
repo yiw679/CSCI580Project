@@ -42,6 +42,7 @@ public:
 
 	float GetHeight(int x, int y);
 
+	float GetHeightScale() const { return m_heightScale; }
 	bool LoadTexture(const char* fileName, unsigned int textureIndex);
 
 	void Generate(float mag, float roughness);

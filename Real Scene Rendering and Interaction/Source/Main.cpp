@@ -110,7 +110,8 @@ int main(void)
 	shader.setInt("OutTexture2", 1);
 	shader.setInt("OutTexture3", 2);
 
-
+    // bind terrain to camera
+    Input::getInstance().cam.setTerrain(&NewTerrain);
 
     // Generates Shader objects
     Shader skyboxShader("Source/skybox.vert", "Source/skybox.frag");
@@ -256,7 +257,11 @@ int main(void)
         // Switch back to the normal depth function
         glDepthFunc(GL_LESS);
 
+        // update cam position everything frame to match terrain height
+        Input::getInstance().cam.update();
+
         time->update();
+
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
