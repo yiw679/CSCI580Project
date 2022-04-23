@@ -24,5 +24,4 @@ void main()
 
     v2f_positionW = model * vec4(aPos, 1); 
     v2f_normalW = model * vec4(aNormal, 0);
-    v2f_texcoord = aTexCoord;
 }

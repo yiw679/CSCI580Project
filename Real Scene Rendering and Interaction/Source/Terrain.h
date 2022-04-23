@@ -7,10 +7,11 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/noise.hpp>
 #include "stb_image.h"
 #include <limits>
 
-#define TEXTURE_NUM 3
+#define TEXTURE_NUM 4
 
 
 using namespace std;
@@ -68,6 +69,7 @@ private:
 	GLuint	m_Tex1BufferID;
 	GLuint	m_Tex2BufferID;
 	GLuint	m_Tex3BufferID;
+	GLuint	m_Tex4BufferID;
 
 	GLuint	m_GLTextures[TEXTURE_NUM];
 

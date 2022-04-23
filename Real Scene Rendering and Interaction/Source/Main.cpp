@@ -103,12 +103,15 @@ int main(void)
     NewTerrain.LoadTexture("Textures/grass.jpg", 0);
     NewTerrain.LoadTexture("Textures/rock.jpg", 1);
     NewTerrain.LoadTexture("Textures/snow.jpg", 2);
+    NewTerrain.LoadTexture("Textures/dirt.jpg", 3);
 
     shader.Enable();
 
     shader.setInt("OutTexture1", 0);
 	shader.setInt("OutTexture2", 1);
 	shader.setInt("OutTexture3", 2);
+    shader.setInt("OutTexture4", 3);
+
 
     // bind terrain to camera
     Input::getInstance().cam.setTerrain(&NewTerrain);
@@ -216,8 +219,10 @@ int main(void)
         glm::mat4 model = NewTerrain.m_Xmw;
         glm::mat4 lightModel = glm::rotate(model, glm::radians((float) glfwGetTime() * 90), glm::vec3(0, -1, 0)) * glm::translate(model, glm::vec3(90, 0, 0));
 
+        glm::mat4 viewM = Input::getInstance().cam.getPosition();
+
         shader.setMat4("projection", projection);
-        shader.setMat4("view", Input::getInstance().cam.getPosition());
+        shader.setMat4("view", viewM);
         shader.setMat4("model", model);
 
         shader.setVec4("LightPosW", glm::value_ptr(lightModel[3]));
