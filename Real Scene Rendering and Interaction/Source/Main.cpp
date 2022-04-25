@@ -85,7 +85,7 @@ int main(void)
     const glm::vec4 white(1);
     const glm::vec4 black(0);
     const glm::vec4 ambient(0.1f, 0.1f, 0.1f, 1.0f);
-    const glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+    const glm::vec3 lightPos(64.0f, 64.0f, 10.0f);
 
     Input::getInstance().SetCamera(cam);
 
@@ -225,8 +225,8 @@ int main(void)
         //lightColor.x = static_cast<float>(sin(glfwGetTime() * 2.0));
         //lightColor.y = static_cast<float>(sin(glfwGetTime() * 0.7));
         //lightColor.z = static_cast<float>(sin(glfwGetTime() * 1.3));
-        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
-        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+        glm::vec3 diffuseColor = lightColor * glm::vec3(1.0f);
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
         shader.setVec3("light.color", glm::value_ptr(glm::vec3(lightColor)));
         shader.setVec3("light.ambient", glm::value_ptr(glm::vec3(ambientColor)));
         shader.setVec3("light.diffuse", glm::value_ptr(glm::vec3(diffuseColor)));
@@ -237,7 +237,7 @@ int main(void)
         shader.setVec3("material.ambient", glm::value_ptr(ambient));
         shader.setVec3("material.diffuse", glm::value_ptr(white));
         shader.setVec3("material.specular", glm::value_ptr(white)); // specular lighting doesn't have full effect on this object's material
-        shader.setFloat("material.shininess", 50.0f);
+        shader.setFloat("material.shininess", 2.0f);
 
 
         shader.setMat4("projection", projection);
