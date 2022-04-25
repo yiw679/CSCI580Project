@@ -85,6 +85,7 @@ int main(void)
     const glm::vec4 white(1);
     const glm::vec4 black(0);
     const glm::vec4 ambient(0.1f, 0.1f, 0.1f, 1.0f);
+    const glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
     Input::getInstance().SetCamera(cam);
 
@@ -209,17 +210,41 @@ int main(void)
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        shader.Enable();
-        shader.setFloat("tileSize", (3 / (float)map_size));
-
         glm::mat4 projection = glm::perspective(45.0f, 16.0f / 9, 0.1f, 100.0f);
+        glm::mat4 view = Input::getInstance().cam.getPosition();
         glm::mat4 model = NewTerrain.m_Xmw;
         glm::mat4 lightModel = glm::rotate(model, glm::radians((float) glfwGetTime() * 90), glm::vec3(0, -1, 0)) * glm::translate(model, glm::vec3(90, 0, 0));
 
+        // shader setup
+        shader.Enable();
+        shader.setVec3("viewPos", glm::value_ptr(cam.position));
+        shader.setFloat("tileSize", (3 / (float)map_size));
+
+        // light setup
+        glm::vec3 lightColor = white;
+        //lightColor.x = static_cast<float>(sin(glfwGetTime() * 2.0));
+        //lightColor.y = static_cast<float>(sin(glfwGetTime() * 0.7));
+        //lightColor.z = static_cast<float>(sin(glfwGetTime() * 1.3));
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+        shader.setVec3("light.color", glm::value_ptr(glm::vec3(lightColor)));
+        shader.setVec3("light.ambient", glm::value_ptr(glm::vec3(ambientColor)));
+        shader.setVec3("light.diffuse", glm::value_ptr(glm::vec3(diffuseColor)));
+        shader.setVec3("light.specular", glm::value_ptr(glm::vec3(1.0f, 1.0f, 1.0f)));
+        shader.setVec3("light.position", glm::value_ptr(glm::vec3(lightPos)));
+
+        // material properties
+        shader.setVec3("material.ambient", glm::value_ptr(ambient));
+        shader.setVec3("material.diffuse", glm::value_ptr(white));
+        shader.setVec3("material.specular", glm::value_ptr(white)); // specular lighting doesn't have full effect on this object's material
+        shader.setFloat("material.shininess", 50.0f);
+
+
         shader.setMat4("projection", projection);
-        shader.setMat4("view", Input::getInstance().cam.getPosition());
+        shader.setMat4("view", view);
         shader.setMat4("model", model);
 
+        /*
         shader.setVec4("LightPosW", glm::value_ptr(lightModel[3]));
         shader.setVec4("LightColor", glm::value_ptr(white));
         shader.setVec4("Ambient", glm::value_ptr(ambient));
@@ -230,6 +255,7 @@ int main(void)
         shader.setVec4("MaterialDiffuse", glm::value_ptr(white));
         shader.setVec4("MaterialSpecular", glm::value_ptr(white));
         shader.setFloat("MaterialShininess", 50.0f);
+        */
 
         NewTerrain.Render();
 
@@ -237,7 +263,7 @@ int main(void)
         glDepthFunc(GL_LEQUAL);
 
         skyboxShader.Enable();
-        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::mat4(1.0f);
         projection = glm::mat4(1.0f);
         // We make the mat4 into a mat3 and then a mat4 again in order to get rid of the last row and column
         // The last row and column affect the translation of the skybox (which we don't want to affect)
