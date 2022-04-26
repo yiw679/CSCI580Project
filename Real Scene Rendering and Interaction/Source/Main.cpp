@@ -104,12 +104,15 @@ int main(void)
     NewTerrain.LoadTexture("Textures/grass.jpg", 0);
     NewTerrain.LoadTexture("Textures/rock.jpg", 1);
     NewTerrain.LoadTexture("Textures/snow.jpg", 2);
+    NewTerrain.LoadTexture("Textures/dirt.jpg", 3);
 
     shader.Enable();
 
     shader.setInt("OutTexture1", 0);
 	shader.setInt("OutTexture2", 1);
 	shader.setInt("OutTexture3", 2);
+    shader.setInt("OutTexture4", 3);
+
 
     // bind terrain to camera
     Input::getInstance().cam.setTerrain(&NewTerrain);

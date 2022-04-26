@@ -141,7 +141,7 @@ void Terrain::Generate(float mag, float roughness) {
 
 			m_PositionBuffer[index] = glm::vec3(m_x, m_y, m_z);
 			m_NormalBuffer[index] = glm::vec3(0, 0, 0);
-			m_ColorBuffer[index] = glm::vec4(t0, t1, t2, 0);
+			m_ColorBuffer[index] = glm::vec4(t0, t1, t2, glm::perlin(glm::vec2(m_x, m_z)));
 			m_TexCoordBuffer[index] = glm::vec2(S, T);
 		}
 	}
@@ -240,6 +240,10 @@ void Terrain::GenerateVertexBuffers() {
 	glBindBuffer(GL_ARRAY_BUFFER, m_Tex3BufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * m_TexCoordBuffer.size(), &m_TexCoordBuffer[2], GL_STATIC_DRAW);
 
+	glGenBuffers(1, &m_Tex4BufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_Tex4BufferID);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * m_TexCoordBuffer.size(), &m_TexCoordBuffer[3], GL_STATIC_DRAW);
+
 	glGenBuffers(1, &m_IndexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, m_IndexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLuint) * m_IndexBuffer.size(), &(m_IndexBuffer[0]), GL_STATIC_DRAW);
@@ -279,6 +283,18 @@ void Terrain::Render() {
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_PRIMARY_COLOR);
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_SRC_ALPHA);
 	glClientActiveTexture(GL_TEXTURE2);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, m_GLTextures[3]);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_TEXTURE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_PRIMARY_COLOR);
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_SRC_ALPHA);
+	glClientActiveTexture(GL_TEXTURE3);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -330,6 +346,10 @@ void Terrain::Render() {
 	glDisable(GL_TEXTURE_2D);
 	glClientActiveTexture(GL_TEXTURE2);
 
+	glActiveTexture(GL_TEXTURE3);
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+	glClientActiveTexture(GL_TEXTURE3);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

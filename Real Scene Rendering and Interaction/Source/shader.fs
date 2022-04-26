@@ -29,13 +29,13 @@ uniform Light light;
 uniform sampler2D OutTexture1;
 uniform sampler2D OutTexture2;
 uniform sampler2D OutTexture3;
+uniform sampler2D OutTexture4;
 uniform float tileSize;
-
 void main()
 {
     // texture
     vec2 tile = fract(TexCoord.xy / vec2(tileSize, tileSize));
-    vec4 grass = texture(OutTexture1, tile);
+    vec4 grass = texture(OutTexture4, tile) * n + texture(OutTexture1, tile) * (1.0f - n);
     vec4 rock = texture(OutTexture2, tile);
     vec4 snow = texture(OutTexture3, tile);
     vec4 OutTexture = grass * outColor.x + rock * outColor.y + snow * outColor.z;
