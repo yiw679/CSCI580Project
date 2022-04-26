@@ -31,8 +31,15 @@ uniform sampler2D OutTexture2;
 uniform sampler2D OutTexture3;
 uniform sampler2D OutTexture4;
 uniform float tileSize;
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453);
+}
+
 void main()
 {
+
+    float n = outColor.w + rand(FragPos.xy);
     // texture
     vec2 tile = fract(TexCoord.xy / vec2(tileSize, tileSize));
     vec4 grass = texture(OutTexture4, tile) * n + texture(OutTexture1, tile) * (1.0f - n);
